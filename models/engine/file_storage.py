@@ -38,31 +38,38 @@ class FileStorage:
 
     def new(self, obj):
         """ Adds a new object to __objects with key <obj class name>.id """
-        self.__objects["{}.{}".format(type(obj).__name__, obj.id)] = obj
+        self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
 
     def save(self):
-        """ Serializes __objects to the JSON file. """
-        odict = {o: self.__objects[o].to_dict() for o in self.__objects.keys()}
-        with open(self.__file_path, "w", encoding="utf-8") as f:
-            json.dump(odict, f)
+        """Saves storage dictionary to file"""
+        with open(FileStorage.__file_path, 'w') as f:
+            temp = {}
+            temp.update(FileStorage.__objects)
+            for key, val in temp.items():
+                temp[key] = val.to_dict()
+            json.dump(temp, f)
 
     def reload(self):
         """Deserializes the JSON file to __objects, if the file exists."""
+        classes = {
+                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
+                    'State': State, 'City': City, 'Amenity': Amenity,
+                    'Review': Review
+                  }
         try:
-            with open(self.__file_path, "r", encoding="utf-8") as f:
-                for o in json.load(f).values():
-                    name = o["__class__"]
-                    del o["__class__"]
-                    self.new(eval(name)(**o))
+            temp = {}
+            with open(FileStorage.__file_path, 'r') as f:
+                temp = json.load(f)
+                for key, val in temp.items():
+                    self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
     
     def delete(self, obj=None):
         """ Deletes a given object from __obj, if it exists """
-        try:
-            del self.__objects["{}.{}".format(type(obj).__name__, obj.id)]
-        except (AttributeError, KeyError):
-            pass
+        if (obj):
+            key = "{}.{}".format(type(obj).__name__, obj.id)
+            del self.__objects[key]
 
     def close(self):
         """Call the reload method."""
