@@ -36,7 +36,7 @@ class DBStorage:
         if getenv("HBNB_ENV") == test:
             Base.metadata.dropall(self.__engine)
 
-         def all(self, cls=None):
+    def all(self, cls=None):
         """Query on the curret database session all objects of the given class.
 
         If cls is None, queries all types of objects.
