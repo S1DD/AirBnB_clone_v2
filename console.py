@@ -48,6 +48,8 @@ class HBNBCommand(cmd.Cmd):
         "Review"
     }
 
+    types = {
+
     def emptyline(self):
         """Do nothing upon receiving an empty line."""
         pass
@@ -83,8 +85,8 @@ class HBNBCommand(cmd.Cmd):
         return True
 
     def do_create(self, arg):
-        """Usage: create <class>
-        Create a new class instance and print its id.
+        """Usage: create <class> <param1> <param2> <param3>...
+        Create a new class instance, the key/value and print its id.
         """
         argl = parse(arg)
         if len(argl) == 0:
@@ -93,6 +95,37 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
         else:
             print(eval(argl[0])().id)
+
+        class_name = argl[0]
+        params = argl[1:]
+
+        valid_params = {}
+
+        str_pattern = r'^"([^"]*\\")*[^"]*"$'
+        float_pattern = r'^[+-]?\d+\.\d+$'
+        int_pattern = r'^[+-]?\d+$'
+
+        for param in params:
+            if '=' in param:
+                continue
+            key, value = param.split('=', 1)
+
+            if re.match(str_pattern, value):
+                value = value[1:-1].replace(r'\"', '"').replace('_', ' ')
+                valid_params[key] = value
+            
+            elif re.match(float_pattern, value):
+                valid_params[key] = float(value)
+
+            elif re.match(int_pattern, value):
+                valid_params[key] = int(value)
+
+            else:
+                continue
+        cls_obj = HBNBCommand.__classes.get(class_name)
+        if cls_obj:
+            obj = cls_obj(**valid_params)
+            print(obj.id)
             storage.save()
 
     def do_show(self, arg):
