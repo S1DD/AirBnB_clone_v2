@@ -27,13 +27,14 @@ class FileStorage:
         Otherwise, returns the __objects dictionary.
         """
         if cls is not None:
-            if type(cls) == str:
+            if isinstance(cls, str):
                 cls = eval(cls)
-            cls_dict = {}
-            for k, v in self.__objects.items():
-                if type(v) == cls:
-                    cls_dict[k] = v
+
+            cls_dict {}
+            for key, value in self.__objects.items():
+                cls_dict[key] = value
             return cls_dict
+                
         return self.__objects
 
     def new(self, obj):
@@ -69,7 +70,8 @@ class FileStorage:
         """ Deletes a given object from __obj, if it exists """
         if (obj):
             key = "{}.{}".format(type(obj).__name__, obj.id)
-            del self.__objects[key]
+            if key in self.__objects:
+                del self.__objects[key]
 
     def close(self):
         """Call the reload method."""
