@@ -33,8 +33,8 @@ class DBStorage:
                                              getenv("HBNB_MYSQL_HOST"),
                                              getenv("HBNB_MYSQL_DB")),
                                       pool_pre_ping=True)
-        if getenv("HBNB_ENV") == test:
-            Base.metadata.dropall(self.__engine)
+        if getenv("HBNB_ENV") == 'test':
+            Base.metadata.dropall(bind=self.__engine)
 
     def all(self, cls=None):
         """Query on the curret database session all objects of the given class.
@@ -44,19 +44,26 @@ class DBStorage:
         Return:
             Dict of queried classes in the format <class name>.<obj id> = obj.
         """
+        objects_dict = {}
+        
         if cls is None:
-            objs = self.__session.query(State).all()
-            objs.extend(self.__session.query(City).all())
-            objs.extend(self.__session.query(User).all())
-            objs.extend(self.__session.query(Place).all())
-            objs.extend(self.__session.query(Review).all())
-            objs.extend(self.__session.query(Amenity).all())
+            objects_list = self.__session.query(State).all()
+            objects_list.extend(self.__session.query(City).all())
+            objects_list.extend(self.__session.query(User).all())
+            objects_list.extend(self.__session.query(Place).all())
+            objects_list.extend(self.__session.query(Review).all())
+            objects_list.extend(self.__session.query(Amenity).all())
         else:
             if type(cls) == str:
                 cls = eval(cls)
-            objs = self.__session.query(cls)
-        return {"{}.{}".format(type(o).__name__, o.id): o for o in objs}
+            objects_list = self.__session.query(cls).all()
 
+        for obj in objects_list:
+            key = "{}.{}".format(type(obj).__name__, obj.id)
+            objects_dict[key] = obj
+
+        return objects_dict
+    
     def new(self, obj):
         """Add obj to the current database session."""
         self.__session.add(obj)

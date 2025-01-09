@@ -30,7 +30,7 @@ class FileStorage:
             if isinstance(cls, str):
                 cls = eval(cls)
 
-            cls_dict {}
+            cls_dict = {}
             for key, value in self.__objects.items():
                 cls_dict[key] = value
             return cls_dict
