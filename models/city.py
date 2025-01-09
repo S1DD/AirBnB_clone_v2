@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 """Defines the City class."""
-from models.base_model import BaseModel
-from models.base_model import Base
-from sqlalchemy import Column, ForeignKey
-from sqlalchemy import String
+from sqlalchemy.ext.declarative import declarative_base
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, String, Integer
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
+from models.place import Place
 
 class City(BaseModel, Base):
     """Represents a city for a MySQL database.
